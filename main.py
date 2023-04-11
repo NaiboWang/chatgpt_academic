@@ -14,7 +14,7 @@ if not AUTHENTICATION: AUTHENTICATION = None
 from check_proxy import get_current_version
 initial_prompt = "Serve me as a writing and programming assistant."
 # title_html = f"<h1 align=\"center\">ChatGPT Academic For IDS students and staffs</h1><p style='text-align: center'>Dark theme is not friendly for display, so if you are in dark mode, we suggest you change to <a href='/?__dark-theme=false'>Light Theme</a>.</p>"
-title_html = f"<h1 align=\"center\">ChatGPT Academic For IDS students and staffs</h1><p style='text-align: center'>If you find some problems when using this tool, or you want to add more functions (more quick actions), please contact Naibo at: <a href='mailto:naibowang@comp.nus.edu.sg' target='_blank'>naibowang@comp.nus.edu.sg</a></p>"
+title_html = f"<h1 align=\"center\">ChatGPT Academic For IDS students and staffs</h1><p style='text-align: center; font-size:16px'>If you find any problems when using this tool, or you want to add more functions (such as more quick actions), please contact Naibo at: <a href='mailto:naibowang@comp.nus.edu.sg' target='_blank'>naibowang@comp.nus.edu.sg</a>.</p>"
 description =  """代码开源和更新[地址🚀](https://github.com/binary-husky/chatgpt_academic)，感谢热情的[开发者们❤️](https://github.com/binary-husky/chatgpt_academic/graphs/contributors)"""
 
 # 问询记录, python 版本建议3.9+（越新越好）

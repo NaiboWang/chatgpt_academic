@@ -136,6 +136,7 @@ dmypy.json
 history
 ssr_conf
 config_private.py
+config_private_naibo.py
 gpt_log
 private.md
 private_upload

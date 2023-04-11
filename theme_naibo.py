@@ -236,10 +236,4 @@ if CODE_HIGHLIGHT:
 .btn-primary {
     background-color: #007bff !important;
 }
-.markdown-body pre code {
-    background-color: darkgrey !important;
-}
-#component-31, #component-52, #component-59{
-    display: none !important;
-} 
 """
