@@ -62,15 +62,22 @@ def adjust_theme():
             checkbox_label_background_fill_dark="linear-gradient(to top, *neutral_900, *neutral_800)",
             checkbox_label_background_fill_hover="linear-gradient(to top, *neutral_100, white)",
             checkbox_label_background_fill_hover_dark="linear-gradient(to top, *neutral_900, *neutral_800)",
-            button_primary_background_fill="linear-gradient(to bottom right, *primary_100, *primary_300)",
+            button_primary_background_fill="#007bff",
+            button_primary_text_color="white",
+            button_primary_border_color="#0062cc",
+            button_primary_background_fill_hover="#0069d9",
             button_primary_background_fill_dark="linear-gradient(to bottom right, *primary_500, *primary_600)",
-            button_primary_background_fill_hover="linear-gradient(to bottom right, *primary_100, *primary_200)",
             button_primary_background_fill_hover_dark="linear-gradient(to bottom right, *primary_500, *primary_500)",
             button_primary_border_color_dark="*primary_500",
             button_secondary_background_fill="linear-gradient(to bottom right, *neutral_100, *neutral_200)",
             button_secondary_background_fill_dark="linear-gradient(to bottom right, *neutral_600, *neutral_700)",
             button_secondary_background_fill_hover="linear-gradient(to bottom right, *neutral_100, *neutral_100)",
             button_secondary_background_fill_hover_dark="linear-gradient(to bottom right, *neutral_600, *neutral_600)",
+            # button_secondary_background_fill="#ffffff",
+            # button_secondary_text_color="darkblue",
+            # button_secondary_text_color_hover="#ffffff",
+            # button_secondary_border_color="#007bff",
+            # button_secondary_background_fill_hover="#007bff",
             button_cancel_background_fill=f"linear-gradient(to bottom right, {color_er.c100}, {color_er.c200})",
             button_cancel_background_fill_dark=f"linear-gradient(to bottom right, {color_er.c600}, {color_er.c700})",
             button_cancel_background_fill_hover=f"linear-gradient(to bottom right, {color_er.c100}, {color_er.c100})",
@@ -154,16 +161,14 @@ advanced_css = """
     padding: 1em;
     margin: 1em 2em 1em 0.5em;
 }
-
 """
 
 if CODE_HIGHLIGHT:
     advanced_css += """
-
 .hll { background-color: #ffffcc }
 .c { color: #3D7B7B; font-style: italic } /* Comment */
 .err { border: 1px solid #FF0000 } /* Error */
-.k { color: hsl(197, 94%, 51%); font-weight: bold } /* Keyword */
+.k { color: #0000CD; font-weight: bold } /* Keyword */
 .o { color: #666666 } /* Operator */
 .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
 .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
@@ -190,13 +195,13 @@ if CODE_HIGHLIGHT:
 .m { color: #666666 } /* Literal.Number */
 .s { color: #BA2121 } /* Literal.String */
 .na { color: #687822 } /* Name.Attribute */
-.nb { color: #e5f8c3 } /* Name.Builtin */
+.nb { color: #8A2BE2 } /* Name.Builtin */
 .nc { color: #ffad65; font-weight: bold } /* Name.Class */
 .no { color: #880000 } /* Name.Constant */
 .nd { color: #AA22FF } /* Name.Decorator */
 .ni { color: #717171; font-weight: bold } /* Name.Entity */
 .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
-.nf { color: #f9f978 } /* Name.Function */
+.nf { color: #000080 } /* Name.Function */
 .nl { color: #767600 } /* Name.Label */
 .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
 .nt { color: #008000; font-weight: bold } /* Name.Tag */
@@ -213,7 +218,7 @@ if CODE_HIGHLIGHT:
 .sc { color: #BA2121 } /* Literal.String.Char */
 .dl { color: #BA2121 } /* Literal.String.Delimiter */
 .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
-.s2 { color: #2bf840 } /* Literal.String.Double */
+.s2 { color: #0000CD } /* Literal.String.Double */
 .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
 .sh { color: #BA2121 } /* Literal.String.Heredoc */
 .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
@@ -228,4 +233,7 @@ if CODE_HIGHLIGHT:
 .vi { color: #19177C } /* Name.Variable.Instance */
 .vm { color: #19177C } /* Name.Variable.Magic */
 .il { color: #666666 } /* Literal.Number.Integer.Long */
+.btn-primary {
+    background-color: #007bff !important;
+}
 """

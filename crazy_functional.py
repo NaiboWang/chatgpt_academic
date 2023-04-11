@@ -15,10 +15,12 @@ def get_crazy_functions():
     from crazy_functions.解析项目源代码 import 解析一个Rect项目
     from crazy_functions.高级功能函数模板 import 高阶功能模板函数
     from crazy_functions.代码重写为全英文_多线程 import 全项目切换英文
-    from crazy_functions.Latex全文润色 import Latex英文润色
 
     function_plugins = {
-
+        "请解析并解构此项目本身（源码自译解）": {
+            "AsButton": False,  # 加入下拉菜单中
+            "Function": HotReload(解析项目本身)
+        },
         "解析整个Python项目": {
             "Color": "stop",    # 按钮颜色
             "Function": HotReload(解析一个Python项目)
@@ -27,7 +29,7 @@ def get_crazy_functions():
             "Color": "stop",    # 按钮颜色
             "Function": HotReload(解析一个C项目的头文件)
         },
-        "解析整个C++项目（.cpp/.hpp/.c/.h）": {
+        "解析整个C++项目（.cpp/.h）": {
             "Color": "stop",    # 按钮颜色
             "AsButton": False,  # 加入下拉菜单中
             "Function": HotReload(解析一个C项目)
@@ -55,15 +57,11 @@ def get_crazy_functions():
             "Color": "stop",    # 按钮颜色
             "Function": HotReload(批量生成函数注释)
         },
-        "[多线程Demo] 解析此项目本身（源码自译解）": {
-            "Function": HotReload(解析项目本身)
-        },
         "[多线程demo] 把本项目源代码切换成全英文": {
             # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-            "AsButton": False,  # 加入下拉菜单中
             "Function": HotReload(全项目切换英文)
         },
-        "[函数插件模板Demo] 历史上的今天": {
+        "[函数插件模板demo] 历史上的今天": {
             # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
             "Function": HotReload(高阶功能模板函数)
         },
@@ -78,9 +76,6 @@ def get_crazy_functions():
     from crazy_functions.谷歌检索小助手 import 谷歌检索小助手
     from crazy_functions.理解PDF文档内容 import 理解PDF文档内容
     from crazy_functions.理解PDF文档内容 import 理解PDF文档内容标准文件输入
-    from crazy_functions.Latex全文润色 import Latex中文润色
-    from crazy_functions.Latex全文翻译 import Latex中译英
-    from crazy_functions.Latex全文翻译 import Latex英译中
 
     function_plugins.update({
         "批量翻译PDF文档（多线程）": {
@@ -88,13 +83,13 @@ def get_crazy_functions():
             "AsButton": True,  # 加入下拉菜单中
             "Function": HotReload(批量翻译PDF文档)
         },
-        "[测试功能] 批量总结PDF文档": {
+        "[仅供开发调试] 批量总结PDF文档": {
             "Color": "stop",
             "AsButton": False,  # 加入下拉菜单中
             # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
             "Function": HotReload(批量总结PDF文档)
         },
-        "[测试功能] 批量总结PDF文档pdfminer": {
+        "[仅供开发调试] 批量总结PDF文档pdfminer": {
             "Color": "stop",
             "AsButton": False,  # 加入下拉菜单中
             "Function": HotReload(批量总结PDF文档pdfminer)
@@ -108,44 +103,17 @@ def get_crazy_functions():
             "Color": "stop",
             "Function": HotReload(总结word文档)
         },
-        # "[测试功能] 理解PDF文档内容（Tk文件选择接口，仅本地）": {
-        #     # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-        #     "AsButton": False,  # 加入下拉菜单中
-        #     "Function": HotReload(理解PDF文档内容)
-        # },
-        "[测试功能] 理解PDF文档内容（通用接口，读取文件输入区）": {
+        "理解PDF文档内容（Tk文件选择接口，仅本地）": {
+            # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
+            "AsButton": False,  # 加入下拉菜单中
+            "Function": HotReload(理解PDF文档内容)
+        },
+        "理解PDF文档内容（通用接口，读取文件输入区）": {
             # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
             "Color": "stop",
             "AsButton": False,  # 加入下拉菜单中
             "Function": HotReload(理解PDF文档内容标准文件输入)
         },
-        "[测试功能] 英文Latex项目全文润色（输入路径或上传压缩包）": {
-            # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-            "Color": "stop",
-            "AsButton": False,  # 加入下拉菜单中
-            "Function": HotReload(Latex英文润色)
-        },
-        "[测试功能] 中文Latex项目全文润色（输入路径或上传压缩包）": {
-            # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-            "Color": "stop",
-            "AsButton": False,  # 加入下拉菜单中
-            "Function": HotReload(Latex中文润色)
-        },
-
-        "[测试功能] Latex项目全文中译英（输入路径或上传压缩包）": {
-            # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-            "Color": "stop",
-            "AsButton": False,  # 加入下拉菜单中
-            "Function": HotReload(Latex中译英)
-        },
-        "[测试功能] Latex项目全文英译中（输入路径或上传压缩包）": {
-            # HotReload 的意思是热更新，修改函数插件代码后，不需要重启程序，代码直接生效
-            "Color": "stop",
-            "AsButton": False,  # 加入下拉菜单中
-            "Function": HotReload(Latex英译中)
-        },
-
-        
     })
 
     ###################### 第三组插件 ###########################

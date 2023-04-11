@@ -4,8 +4,8 @@ from request_llm.bridge_chatgpt import predict
 from toolbox import format_io, find_free_port, on_file_uploaded, on_report_generated, get_conf, ArgsGeneralWrapper, DummyWith
 
 # 建议您复制一个config_private.py放自己的秘密, 如API和代理网址, 避免不小心传github被别人看到
-proxies, WEB_PORT, LLM_MODEL, CONCURRENT_COUNT, AUTHENTICATION, CHATBOT_HEIGHT, LAYOUT, API_KEY = \
-    get_conf('proxies', 'WEB_PORT', 'LLM_MODEL', 'CONCURRENT_COUNT', 'AUTHENTICATION', 'CHATBOT_HEIGHT', 'LAYOUT', 'API_KEY')
+proxies, WEB_PORT, LLM_MODEL, CONCURRENT_COUNT, AUTHENTICATION, CHATBOT_HEIGHT, LAYOUT = \
+    get_conf('proxies', 'WEB_PORT', 'LLM_MODEL', 'CONCURRENT_COUNT', 'AUTHENTICATION', 'CHATBOT_HEIGHT', 'LAYOUT')
 
 # 如果WEB_PORT是-1, 则随机选取WEB端口
 PORT = find_free_port() if WEB_PORT <= 0 else WEB_PORT
@@ -13,7 +13,8 @@ if not AUTHENTICATION: AUTHENTICATION = None
 
 from check_proxy import get_current_version
 initial_prompt = "Serve me as a writing and programming assistant."
-title_html = f"<h1 align=\"center\">ChatGPT 学术优化 {get_current_version()}</h1>"
+# title_html = f"<h1 align=\"center\">ChatGPT Academic For IDS students and staffs</h1><p style='text-align: center'>Dark theme is not friendly for display, so if you are in dark mode, we suggest you change to <a href='/?__dark-theme=false'>Light Theme</a>.</p>"
+title_html = f"<h1 align=\"center\">ChatGPT Academic For IDS students and staffs</h1><p style='text-align: center'>If you find some problems when using this tool, or you want to add more functions (more quick actions), please contact Naibo at: <a href='mailto:naibowang@comp.nus.edu.sg' target='_blank'>naibowang@comp.nus.edu.sg</a></p>"
 description =  """代码开源和更新[地址🚀](https://github.com/binary-husky/chatgpt_academic)，感谢热情的[开发者们❤️](https://github.com/binary-husky/chatgpt_academic/graphs/contributors)"""
 
 # 问询记录, python 版本建议3.9+（越新越好）
@@ -50,26 +51,33 @@ if LAYOUT == "TOP-DOWN":
     CHATBOT_HEIGHT /= 2
 
 cancel_handles = []
-with gr.Blocks(title="ChatGPT 学术优化", theme=set_theme, analytics_enabled=False, css=advanced_css) as demo:
+js = """window.addEventListener('load', function () {
+  gradioURL = window.location.href
+  if (!gradioURL.endsWith('?__theme=light')) {
+    window.location.replace(gradioURL + '?__theme=light');
+  }
+});"""
+
+with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=False, css=advanced_css) as demo:
     gr.HTML(title_html)
-    cookies = gr.State({'api_key': API_KEY, 'llm_model': LLM_MODEL})
+    demo.load(__js = js)
     with gr_L1():
         with gr_L2(scale=2):
             chatbot = gr.Chatbot()
             chatbot.style(height=CHATBOT_HEIGHT)
             history = gr.State([])
         with gr_L2(scale=1):
-            with gr.Accordion("输入区", open=True) as area_input_primary:
+            with gr.Accordion("Input Section", open=True) as area_input_primary:
                 with gr.Row():
                     txt = gr.Textbox(show_label=False, placeholder="Input question here.").style(container=False)
                 with gr.Row():
-                    submitBtn = gr.Button("提交", variant="primary")
+                    submitBtn = gr.Button("提交/Submit", variant="primary")
                 with gr.Row():
-                    resetBtn = gr.Button("重置", variant="secondary"); resetBtn.style(size="sm")
-                    stopBtn = gr.Button("停止", variant="secondary"); stopBtn.style(size="sm")
+                    resetBtn = gr.Button("重置/Reset", variant="secondary");
+                    # stopBtn = gr.Button("停止/Stop", variant="secondary"); stopBtn.style(size="sm")
                 with gr.Row():
-                    status = gr.Markdown(f"Tip: 按Enter提交, 按Shift+Enter换行。当前模型: {LLM_MODEL} \n {proxy_info}")
-            with gr.Accordion("基础功能区", open=True) as area_basic_fn:
+                    status = gr.Markdown(f"Tip: Press Enter to submit, press Shift+Enter to start a new line. Current model: {LLM_MODEL} \n {proxy_info}")
+            with gr.Accordion("Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", open=True) as area_basic_fn:
                 with gr.Row():
                     for k in functional:
                         variant = functional[k]["Color"] if "Color" in functional[k] else "secondary"
@@ -97,20 +105,20 @@ with gr.Blocks(title="ChatGPT 学术优化", theme=set_theme, analytics_enabled=
                 system_prompt = gr.Textbox(show_label=True, placeholder=f"System Prompt", label="System prompt", value=initial_prompt)
                 top_p = gr.Slider(minimum=-0, maximum=1.0, value=1.0, step=0.01,interactive=True, label="Top-p (nucleus sampling)",)
                 temperature = gr.Slider(minimum=-0, maximum=2.0, value=1.0, step=0.01, interactive=True, label="Temperature",)
-                checkboxes = gr.CheckboxGroup(["基础功能区", "函数插件区", "底部输入区"], value=["基础功能区", "函数插件区"], label="显示/隐藏功能区")
+                checkboxes = gr.CheckboxGroup(["Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", "函数插件区", "底部输入区"], value=["Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", "函数插件区"], label="显示/隐藏功能区")
                 gr.Markdown(description)
             with gr.Accordion("备选输入区", open=True, visible=False) as area_input_secondary:
                 with gr.Row():
                     txt2 = gr.Textbox(show_label=False, placeholder="Input question here.", label="输入区2").style(container=False)
                 with gr.Row():
-                    submitBtn2 = gr.Button("提交", variant="primary")
+                    submitBtn2 = gr.Button("提交/Submit", variant="primary")
                 with gr.Row():
-                    resetBtn2 = gr.Button("重置", variant="secondary"); resetBtn.style(size="sm")
-                    stopBtn2 = gr.Button("停止", variant="secondary"); stopBtn.style(size="sm")
+                    resetBtn2 = gr.Button("重置/Reset", variant="secondary"); resetBtn.style(size="sm")
+                    stopBtn2 = gr.Button("停止/Stop", variant="secondary");
     # 功能区显示开关与功能区的互动
     def fn_area_visibility(a):
         ret = {}
-        ret.update({area_basic_fn: gr.update(visible=("基础功能区" in a))})
+        ret.update({area_basic_fn: gr.update(visible=("Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)" in a))})
         ret.update({area_crazy_fn: gr.update(visible=("函数插件区" in a))})
         ret.update({area_input_primary: gr.update(visible=("底部输入区" not in a))})
         ret.update({area_input_secondary: gr.update(visible=("底部输入区" in a))})
@@ -118,16 +126,16 @@ with gr.Blocks(title="ChatGPT 学术优化", theme=set_theme, analytics_enabled=
         return ret
     checkboxes.select(fn_area_visibility, [checkboxes], [area_basic_fn, area_crazy_fn, area_input_primary, area_input_secondary, txt, txt2] )
     # 整理反复出现的控件句柄组合
-    input_combo = [cookies, txt, txt2, top_p, temperature, chatbot, history, system_prompt]
-    output_combo = [cookies, chatbot, history, status]
+    input_combo = [txt, txt2, top_p, temperature, chatbot, history, system_prompt]
+    output_combo = [chatbot, history, status]
     predict_args = dict(fn=ArgsGeneralWrapper(predict), inputs=input_combo, outputs=output_combo)
     # 提交按钮、重置按钮
     cancel_handles.append(txt.submit(**predict_args))
     cancel_handles.append(txt2.submit(**predict_args))
     cancel_handles.append(submitBtn.click(**predict_args))
     cancel_handles.append(submitBtn2.click(**predict_args))
-    resetBtn.click(lambda: ([], [], "已重置"), None, [chatbot, history, status])
-    resetBtn2.click(lambda: ([], [], "已重置"), None, [chatbot, history, status])
+    resetBtn.click(lambda: ([], [], "Already Reset"), None, output_combo)
+    resetBtn2.click(lambda: ([], [], "Already Reset"), None, output_combo)
     # 基础功能区的回调函数注册
     for k in functional:
         click_handle = functional[k]["Button"].click(fn=ArgsGeneralWrapper(predict), inputs=[*input_combo, gr.State(True), gr.State(k)], outputs=output_combo)
@@ -156,7 +164,7 @@ with gr.Blocks(title="ChatGPT 学术优化", theme=set_theme, analytics_enabled=
     # click_handle.then(expand_file_area, [file_upload, area_file_up], [area_file_up])
     cancel_handles.append(click_handle)
     # 终止按钮的回调函数注册
-    stopBtn.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
+    # stopBtn.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
     stopBtn2.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
 # gradio的inbrowser触发不太稳定，回滚代码到原始的浏览器打开函数
 def auto_opentab_delay():
@@ -170,5 +178,6 @@ def auto_opentab_delay():
     threading.Thread(target=open, name="open-browser", daemon=True).start()
     threading.Thread(target=auto_update, name="self-upgrade", daemon=True).start()
 
-auto_opentab_delay()
-demo.queue(concurrency_count=CONCURRENT_COUNT).launch(server_name="0.0.0.0", server_port=PORT, auth=AUTHENTICATION)
+# auto_opentab_delay()
+
+demo.queue(concurrency_count=CONCURRENT_COUNT).launch(server_name="0.0.0.0", share=True, server_port=PORT, auth=AUTHENTICATION)
