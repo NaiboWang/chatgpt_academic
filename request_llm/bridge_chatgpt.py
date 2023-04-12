@@ -171,7 +171,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
     if stream:
         raw_input = inputs
         logging.info(f'[raw_input] {raw_input}')
-        chatbot.append((inputs, "Waiting for OpenAI's response, please wait. Maybe you should wait for 1 minute or more when the response is long, just don't close this window."))
+        chatbot.append((inputs, "Waiting for OpenAI's response, please wait. Maybe you should wait for 1 minute or more when the response is long, so don't close this window."))
         yield chatbot, history, "Waiting..."
 
     headers, payload = generate_payload(inputs, top_p, temperature, history, system_prompt, stream=False)

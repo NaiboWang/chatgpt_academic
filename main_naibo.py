@@ -111,7 +111,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                     # stopBtn = gr.Button("停止/Stop", variant="secondary"); stopBtn.style(size="sm")
                 with gr.Row():
                     status = gr.Markdown(f"Tip: Press Enter to submit, press Shift+Enter to start a new line. Current model: {LLM_MODEL} \n {proxy_info}")
-            with gr.Accordion("Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", open=True) as area_basic_fn:
+            with gr.Accordion("Quick Actions (Will automatically reset the conversation when you click the buttons)", open=True) as area_basic_fn:
                 with gr.Row():
                     for k in functional:
                         variant = functional[k]["Color"] if "Color" in functional[k] else "secondary"
@@ -139,7 +139,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                 system_prompt = gr.Textbox(show_label=True, placeholder=f"System Prompt", label="System prompt", value=initial_prompt)
                 top_p = gr.Slider(minimum=-0, maximum=1.0, value=1.0, step=0.01,interactive=True, label="Top-p (nucleus sampling)",)
                 temperature = gr.Slider(minimum=-0, maximum=2.0, value=1.0, step=0.01, interactive=True, label="Temperature",)
-                checkboxes = gr.CheckboxGroup(["Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", "函数插件区", "底部输入区"], value=["Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)", "函数插件区"], label="显示/隐藏功能区")
+                checkboxes = gr.CheckboxGroup(["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区", "底部输入区"], value=["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区"], label="显示/隐藏功能区")
                 gr.Markdown(description)
             with gr.Accordion("备选输入区", open=True, visible=False) as area_input_secondary:
                 with gr.Row():
@@ -152,7 +152,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     # 功能区显示开关与功能区的互动
     def fn_area_visibility(a):
         ret = {}
-        ret.update({area_basic_fn: gr.update(visible=("Quick Actions (Will automatically reset the conversation when you click the buttons) (Will automatically reset the conversation when you click the buttons)" in a))})
+        ret.update({area_basic_fn: gr.update(visible=("Quick Actions (Will automatically reset the conversation when you click the buttons)" in a))})
         ret.update({area_crazy_fn: gr.update(visible=("函数插件区" in a))})
         ret.update({area_input_primary: gr.update(visible=("底部输入区" not in a))})
         ret.update({area_input_secondary: gr.update(visible=("底部输入区" in a))})
