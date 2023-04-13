@@ -135,20 +135,24 @@ def predict_no_ui_long_connection(inputs, top_p, temperature, history=[], sys_pr
         raise ConnectionAbortedError("正常结束，但显示Token不足，导致输出不完整，请削减单次输入的文本量。")
     return result
 
-def calculate_cost():
+def calculate_cost(identity = "anonymous"):
     with open("total.txt", "r") as f:
         total = float(f.read())
     total_cost = 0.0
+    user_cost = 0.0
     with open("bill.txt", "r") as f:
         for line in f.readlines():
             try:
-                prompt_tokens, completion_tokens, _, _ = line.strip().split(",")
+                prompt_tokens, completion_tokens, _, username = line.strip().split(",")
             except:
                 prompt_tokens, completion_tokens, _ = line.strip().split(",")
+                username = "ids"
             total_cost += int(prompt_tokens) * 0.03 * 0.001 + int(completion_tokens) * 0.06 * 0.001
+            if username.replace(" ","").lower() == identity.lower():
+                    user_cost += int(prompt_tokens) * 0.03 * 0.001 + int(completion_tokens) * 0.06 * 0.001
     remaining = total - total_cost
-    print(f"total: {total}, total_cost: {total_cost}, remaining: {remaining}")
-    return total, total_cost, remaining
+    print(f"total: {total}, total_cost: {total_cost}, remaining: {remaining}, user_cost: {user_cost}")
+    return total, total_cost, remaining, user_cost
 
 def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt='', 
             stream = True, additional_fn=None, identity = ["anonymous"]):
@@ -173,7 +177,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         
     
 
-    total, total_cost, remaining = calculate_cost()
+    total, total_cost, remaining, user_cost = calculate_cost(identity)
     if remaining < 0.01:
         chatbot[-1] = ((chatbot[-1][0], "Sorry, our balance is not enough this month, the service will be suspended."))
         yield chatbot, history, "Not enough balance, the service will be suspended."
@@ -244,7 +248,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         with open("bill.txt", "a") as f:
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S-%f')
             f.write(f"{prompt_tokens}, {completion_tokens}, {time_now}, {identity} \n")
-        total, total_cost, remaining = calculate_cost()
+        total, total_cost, remaining, user_cost = calculate_cost(identity)
         today = datetime.datetime.now().strftime('%Y-%m-%d')
         print(f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')} : {identity}'s Response : {gpt_replying_buffer} \n")
         with open("infos/" + "plain_text_" + today + ".txt", 'a') as f:
@@ -255,7 +259,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         hint += " \n Here is the detail of usage for this time of conversation:  \n\n  1. You send " + str(prompt_tokens) + f" prompt tokens (your input to ChatGPT, 0.03 USD/1K tokens)"+ multi_round + f", which cost {float(prompt_tokens) * 0.03 * 0.001: .5f} USD.  \n   2. You receive " + str(completion_tokens) + f" completion tokens (output from ChatGPT, 0.06 USD/1K tokens), which cost  {float(completion_tokens) * 0.06 * 0.001:.5f} USD. \n\n  You should note that as long as the conversation content is not cleared, the previous questions and answers will be used as input for the next API call, resulting in increased cost with more rounds of conversation. Therefore, ** please try to avoid generating multiple rounds of conversation.** If you have a new question, please ** click the reset button first ** to start a new conversation. \n\n However, you don't need to artificially click the reset button before you use the buttons in the ** Quick Actions ** area, such as English Academic Writing Improvement, we will automatically reset the conversation every time you click them."
 
         chatbot[-1] = (history[-2], history[-1])
-        chatbot.append((f"This time of conversation you spend **${usage:.5f}, ** the remaining credit of this month for whole IDS: **${remaining:.4f}/${total},** please note.", hint))
+        chatbot.append((f"This time you spend **${usage:.5f}**,  you have used **${user_cost:.4f}** in total, the remaining credit for whole IDS: **${remaining:.4f}/${total},** please note.", hint))
         # chatbot.append(("", hint))
         if len(history) // 2 >= 3:
             chatbot.append((f"This is already your {len(history) // 2}-th round of conversation, ** too many rounds will bring huge cost, ** please note.", "** You cannot ask questions for more than 5 rounds. ** If you want to start a new conversation, please ** click the reset button ** to start a new conversation. Most of cases, we don't need to generate multiple rounds of conversation, such as English Academic Writing Improvement, because we don't need the previous conversation context when we want to rephrase a new sentences."))
