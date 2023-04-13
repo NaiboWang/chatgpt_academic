@@ -141,14 +141,17 @@ def calculate_cost():
     total_cost = 0.0
     with open("bill.txt", "r") as f:
         for line in f.readlines():
-            prompt_tokens, completion_tokens, _ = line.strip().split(",")
+            try:
+                prompt_tokens, completion_tokens, _, _ = line.strip().split(",")
+            except:
+                prompt_tokens, completion_tokens, _ = line.strip().split(",")
             total_cost += int(prompt_tokens) * 0.03 * 0.001 + int(completion_tokens) * 0.06 * 0.001
     remaining = total - total_cost
     print(f"total: {total}, total_cost: {total_cost}, remaining: {remaining}")
     return total, total_cost, remaining
 
 def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt='', 
-            stream = True, additional_fn=None):
+            stream = True, additional_fn=None, identity = ["anonymous"]):
     """
         发送至chatGPT，流式获取输出。
         用于基础的对话功能。
@@ -158,6 +161,34 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         chatbot 为WebUI中显示的对话列表，修改它，然后yeild出去，可以直接修改对话界面内容
         additional_fn代表点击的哪个按钮，按钮见functional.py
     """
+    if len(chatbot) >= 1 and chatbot[0][1].find("Hello, I am a GPT-4 model. I can answer your questions") != -1:
+        chatbot.pop(0) # 去掉初始的欢迎语
+
+    print(identity)
+    
+    if identity == "anonymous":
+        print("Invalid identity")
+        yield chatbot, history, "Sorry, the password is wrong.", identity
+        return            
+        
+    
+
+    total, total_cost, remaining = calculate_cost()
+    if remaining < 0.01:
+        chatbot[-1] = ((chatbot[-1][0], "Sorry, our balance is not enough this month, the service will be suspended."))
+        yield chatbot, history, "Not enough balance, the service will be suspended."
+        return
+
+    if len(history) // 2 >= 5:
+        if inputs.find("I am Naibo: ") == -1:
+            print("I'm not Naibo:")
+            chatbot[-1] = ((chatbot[-1][0], "Sorry, the service is suspended because the number of communication rounds exceeds the limit, please reset the conversation and start a new session."))
+            yield chatbot, history, "The service is suspended because the number of communication rounds exceeds the limit.", identity
+            return
+        else:
+            print("I'm Naibo:")
+            inputs = inputs.replace("I am Naibo: ", "")
+
     if additional_fn is not None:
         import core_functional
         importlib.reload(core_functional)    # 热更新prompt
@@ -172,22 +203,13 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         raw_input = inputs
         logging.info(f'[raw_input] {raw_input}')
         chatbot.append((inputs, "Waiting for OpenAI's response, please wait. Maybe you should wait for 1 minute or more when the response is long, so don't close this window."))
-        yield chatbot, history, "Waiting..."
+        yield chatbot, history, "Waiting...", identity
 
-    headers, payload = generate_payload(inputs, top_p, temperature, history, system_prompt, stream=False)
+    headers, payload = generate_payload(inputs, top_p, temperature, history, system_prompt, stream=False, identity=identity)
     history.append(inputs); history.append(" ")
 
     retry = 0
-    total, total_cost, remaining = calculate_cost()
-    if remaining < 0.01:
-        chatbot[-1] = ((chatbot[-1][0], "Sorry, our balance is not enough this month, the service will be suspended."))
-        yield chatbot, history, "Not enough balance, the service will be suspended."
-        return
 
-    if len(history) // 2 > 5:
-        chatbot[-1] = ((chatbot[-1][0], "Sorry, the service is suspended because the number of communication rounds exceeds the limit, please reset the conversation and start a new session."))
-        yield chatbot, history, "The service is suspended because the number of communication rounds exceeds the limit."
-        return
     
     while True:
         try:
@@ -195,7 +217,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
             response = requests.post(API_URL, headers=headers, proxies=proxies,
                                     json=payload, stream=True, timeout=TIMEOUT_SECONDS);
             # print(response.text)
-            filename = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f') + '_response.json'
+            filename = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f') + '_response_'+identity+'.json'
             with open("logs/" + filename, 'w') as f:
                 f.write(response.text)
             break
@@ -203,7 +225,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
             retry += 1
             chatbot[-1] = ((chatbot[-1][0], timeout_bot_msg))
             retry_msg = f"，正在重试 ({retry}/{MAX_RETRY}) ……" if MAX_RETRY > 0 else ""
-            yield chatbot, history, "请求超时"+retry_msg
+            yield chatbot, history, "请求超时"+retry_msg, identity
             if retry > MAX_RETRY: raise TimeoutError
 
     
@@ -221,8 +243,13 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
         multi_round = ""
         with open("bill.txt", "a") as f:
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S-%f')
-            f.write(f"{prompt_tokens}, {completion_tokens}, {time_now} \n")
+            f.write(f"{prompt_tokens}, {completion_tokens}, {time_now}, {identity} \n")
         total, total_cost, remaining = calculate_cost()
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        print(f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')} : {identity}'s Response : {gpt_replying_buffer} \n")
+        with open("infos/" + "plain_text_" + today + ".txt", 'a') as f:
+            f.write(f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')} : {identity}'s Response : {gpt_replying_buffer} \n")
+            
         if len(history) // 2 > 1:
             multi_round = " **including your pervious "+ str(len(history) // 2 - 1) +" round(s) of questions and answers**"
         hint += " \n Here is the detail of usage for this time of conversation:  \n\n  1. You send " + str(prompt_tokens) + f" prompt tokens (your input to ChatGPT, 0.03 USD/1K tokens)"+ multi_round + f", which cost {float(prompt_tokens) * 0.03 * 0.001: .5f} USD.  \n   2. You receive " + str(completion_tokens) + f" completion tokens (output from ChatGPT, 0.06 USD/1K tokens), which cost  {float(completion_tokens) * 0.06 * 0.001:.5f} USD. \n\n  You should note that as long as the conversation content is not cleared, the previous questions and answers will be used as input for the next API call, resulting in increased cost with more rounds of conversation. Therefore, ** please try to avoid generating multiple rounds of conversation.** If you have a new question, please ** click the reset button first ** to start a new conversation. \n\n However, you don't need to artificially click the reset button before you use the buttons in the ** Quick Actions ** area, such as English Academic Writing Improvement, we will automatically reset the conversation every time you click them."
@@ -235,7 +262,7 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
     except:
         chatbot[-1] = ((chatbot[-1][0], "Error, please retry:" + json.loads(response.text)['error']["message"]))
 
-    yield chatbot, history, None
+    yield chatbot, history, None, identity
     is_head_of_the_stream = True
     
     stream = False # 不再使用数据流
@@ -263,11 +290,11 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
                     gpt_replying_buffer = gpt_replying_buffer + json.loads(chunk.decode()[6:])['choices'][0]["delta"]["content"]
                     history[-1] = gpt_replying_buffer
                     chatbot[-1] = (history[-2], history[-1])
-                    yield chatbot, history, status_text
+                    yield chatbot, history, status_text, identity
 
                 except Exception as e:
                     traceback.print_exc()
-                    yield chatbot, history, "Json解析不合常规"
+                    yield chatbot, history, "Json解析不合常规", identity
                     chunk = get_full_error(chunk, stream_response)
                     error_msg = chunk.decode()
                     if "reduce the length" in error_msg:
@@ -281,10 +308,10 @@ def predict(inputs, top_p, temperature, chatbot=[], history=[], system_prompt=''
                         from toolbox import regular_txt_to_markdown
                         tb_str = '```\n' + traceback.format_exc() + '```'
                         chatbot[-1] = (chatbot[-1][0], f"[Local Message] 异常 \n\n{tb_str} \n\n{regular_txt_to_markdown(chunk.decode()[4:])}")
-                    yield chatbot, history, "Json异常" + error_msg
+                    yield chatbot, history, "Json异常" + error_msg, identity
                     return
 
-def generate_payload(inputs, top_p, temperature, history, system_prompt, stream):
+def generate_payload(inputs, top_p, temperature, history, system_prompt, stream, identity):
     """
         整合所有信息，选择LLM模型，生成http请求，为发送请求做准备
     """
@@ -328,15 +355,18 @@ def generate_payload(inputs, top_p, temperature, history, system_prompt, stream)
         "frequency_penalty": 0,
     }
     
-    print(f" {LLM_MODEL} : {conversation_cnt} : {inputs}")
+    print(f" {datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')} : {identity} {LLM_MODEL} : {conversation_cnt} : {inputs}")
     # print(payload)
-    filename = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f') + '_query.json'
+    filename = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f') + '_query_'+identity+'.json'
     if not os.path.exists("logs"):
         os.mkdir("logs")
+    if not os.path.exists("infos"):
+        os.mkdir("infos")
     with open("logs/" + filename, 'w') as f:
         json.dump(payload, f)
-    with open("logs/" + "plain_text.txt", 'a') as f:
-        f.write(f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')} : {LLM_MODEL} : {conversation_cnt} : {inputs}\n")
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    with open("infos/" + "plain_text_" + today + ".txt", 'a') as f:
+        f.write(f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}: {identity} : {LLM_MODEL} : {conversation_cnt} : {inputs}\n")
 
     return headers,payload
 

@@ -43,8 +43,9 @@ set_theme = adjust_theme()
 from check_proxy import check_proxy, auto_update
 proxy_info = check_proxy(proxies)
 
-gr_L1 = lambda: gr.Row().style()
+gr_L1 = lambda: gr.Row(visible=False).style()
 gr_L2 = lambda scale: gr.Column(scale=scale)
+gr_login = lambda: gr.Row(visible=True).style()
 if LAYOUT == "TOP-DOWN": 
     gr_L1 = lambda: DummyWith()
     gr_L2 = lambda scale: gr.Row()
@@ -58,12 +59,39 @@ js = """window.addEventListener('load', function () {
   }
 });"""
 
+idd = ""
+
 with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=False, css=advanced_css) as demo:
+    identity = gr.State("anonymous")
+    # def login(username, password):
+    #     global idd, identity
+    #     print("Inner: ", identity.value)
+    #     if username == "ids" and password == "ids_gpt4":
+    #         idd = username
+    #         # identity = gr.State(idd)
+    #         print("Changed: ", identity.value)
+    #         return True
+    #     return False
+    def login(usr, password):
+        with open("identity.txt", "r") as f:
+            passwords = {}
+            for line in f.readlines():
+                id = line.strip().split(",")[0]
+                pswd = line.strip().split(",")[1]
+                passwords[pswd] = id
+        # print(password, passwords)
+        try:
+            username = passwords[password]
+            return {identity: username, hint: gr.update(visible=False), login_section: gr.update(visible=False), function_section: gr.update(visible=True), chatbot: [(f"Hello **{username}**, welcome to the demo of the **GPT-4** API. Please type your question in the input sections.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")]}
+        except:
+            return {hint: gr.update(visible=True), identity: "anonymous", login_section: gr.update(visible=True), function_section: gr.update(visible=False)}
+            
+    print("identity:", identity.value)
     gr.HTML(title_html)
     demo.load(__js = js)
-    with gr_L1():
+    with gr_L1() as function_section:
         with gr_L2(scale=2):
-            chatbot = gr.Chatbot()
+            chatbot = gr.Chatbot([("Welcome to the demo of the **GPT-4** API. Please type your question in the input sections.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")])
             chatbot.style(height=CHATBOT_HEIGHT)
             history = gr.State([])
         with gr_L2(scale=1):
@@ -115,6 +143,22 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                 with gr.Row():
                     resetBtn2 = gr.Button("重置/Reset", variant="secondary"); resetBtn.style(size="sm")
                     stopBtn2 = gr.Button("停止/Stop", variant="secondary");
+    
+    with gr.Row() as login_section:
+        with gr.Column(scale=0.3, min_width=500):
+            with gr.Row():
+                hint = gr.Label("Incorrect username or password.", visible = False)
+            with gr.Row():
+                username = gr.Textbox(value = "ids", show_label=False, placeholder="Username")
+            with gr.Row():
+                password = gr.Textbox(show_label=False, placeholder="Password", type="password")
+            with gr.Row():
+                login_btn = gr.Button("Login", variant="primary")
+            with gr.Row():
+                img = gr.Image("hint.png")
+            login_btn.click(fn = login, inputs = [username, password], outputs = [identity, hint, login_section, function_section, chatbot])
+            username.submit(fn = login, inputs = [username, password], outputs = [identity, hint, login_section, function_section, chatbot])
+            password.submit(fn = login, inputs = [username, password], outputs = [identity, hint, login_section, function_section, chatbot])
     # 功能区显示开关与功能区的互动
     def fn_area_visibility(a):
         ret = {}
@@ -127,18 +171,20 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     checkboxes.select(fn_area_visibility, [checkboxes], [area_basic_fn, area_crazy_fn, area_input_primary, area_input_secondary, txt, txt2] )
     # 整理反复出现的控件句柄组合
     input_combo = [txt, txt2, top_p, temperature, chatbot, history, system_prompt]
-    output_combo = [chatbot, history, status]
-    predict_args = dict(fn=ArgsGeneralWrapper(predict), inputs=input_combo, outputs=output_combo)
+    # 身份确认
+    output_combo = [chatbot, history, status, identity]
+
+    predict_args = dict(fn=ArgsGeneralWrapper(predict), inputs=[*input_combo, gr.State(True), gr.State(None), identity], outputs=output_combo)
     # 提交按钮、重置按钮
     cancel_handles.append(txt.submit(**predict_args))
     cancel_handles.append(txt2.submit(**predict_args))
     cancel_handles.append(submitBtn.click(**predict_args))
     cancel_handles.append(submitBtn2.click(**predict_args))
-    resetBtn.click(lambda: ([], [], "Already Reset"), None, output_combo)
-    resetBtn2.click(lambda: ([], [], "Already Reset"), None, output_combo)
+    resetBtn.click(lambda identity: ([], [], "Already Reset", identity), [identity], output_combo)
+    # resetBtn2.click(lambda: ([], [], "Already Reset", identity.value), None, output_combo)
     # 基础功能区的回调函数注册
     for k in functional:
-        click_handle = functional[k]["Button"].click(fn=ArgsGeneralWrapper(predict), inputs=[*input_combo, gr.State(True), gr.State(k)], outputs=output_combo)
+        click_handle = functional[k]["Button"].click(fn=ArgsGeneralWrapper(predict), inputs=[*input_combo, gr.State(True), gr.State(k), identity], outputs=output_combo)
         cancel_handles.append(click_handle)
     # 文件上传区，接收文件后与chatbot的互动
     file_upload.upload(on_file_uploaded, [file_upload, chatbot, txt], [chatbot, txt])
@@ -166,6 +212,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     # 终止按钮的回调函数注册
     # stopBtn.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
     stopBtn2.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
+    
 # gradio的inbrowser触发不太稳定，回滚代码到原始的浏览器打开函数
 def auto_opentab_delay():
     import threading, webbrowser, time
@@ -178,6 +225,7 @@ def auto_opentab_delay():
     threading.Thread(target=open, name="open-browser", daemon=True).start()
     threading.Thread(target=auto_update, name="self-upgrade", daemon=True).start()
 
+
 # auto_opentab_delay()
 
-demo.queue(concurrency_count=CONCURRENT_COUNT).launch(server_name="0.0.0.0", share=True, server_port=PORT, auth=AUTHENTICATION)
+demo.queue(concurrency_count=CONCURRENT_COUNT).launch(server_name="0.0.0.0", share=True, server_port=PORT)

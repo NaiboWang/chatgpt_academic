@@ -241,5 +241,26 @@ if CODE_HIGHLIGHT:
 }
 #component-31, #component-52, #component-59{
     display: none !important;
-} 
+}
+#component-70{
+    margin: 0 auto;
+}
+
+#component-71 .no-confidence{
+font-size: 20px;
+color: red;
+}
+
+#component-71 span{
+    display: none;
+}
+#component-71 .float{
+    display: none;
+}
+#component-81 .float{
+    display: none;
+}
+#component-81 button{
+    display: none;
+}
 """
