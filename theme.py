@@ -239,28 +239,26 @@ if CODE_HIGHLIGHT:
 .markdown-body pre code {
     background-color: darkgrey !important;
 }
-#component-31, #component-52, #component-59{
+#component-34, #component-55{
     display: none !important;
 }
-#component-70{
+#component-72{
     margin: 0 auto;
 }
 
-#component-71 .no-confidence{
-font-size: 20px;
-color: red;
+#component-72 span{
+    display: none;
 }
 
-#component-71 span{
-    display: none;
+.no-confidence{
+font-size: 20px!important;
+color: red!important;
 }
-#component-71 .float{
-    display: none;
+
+.float{
+    display: none!important;
 }
-#component-81 .float{
-    display: none;
-}
-#component-81 button{
-    display: none;
+.download{
+    display: none!important;
 }
 """

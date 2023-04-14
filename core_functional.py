@@ -7,7 +7,7 @@ from toolbox import clear_line_break
 
 def get_core_functions():
     return {
-        "英语学术润色/English Academic Writing Improvement": {
+        "English Academic Writing Improvement": {
             # 前言
             "Prefix":   r"Below is a paragraph from an academic paper. Polish the writing to meet the academic style, " +
                         r"improve the spelling, grammar, clarity, concision and overall readability. When necessary, rewrite the whole sentence. " + "\n\n",
@@ -21,7 +21,7 @@ def get_core_functions():
         #                 r"同时分解长句，减少重复，并提供改进建议。请只提供文本的更正版本，避免包括解释。请编辑以下文本" + "\n\n",
         #     "Suffix":   r"",
         # },
-        "查找语法错误/Check Grammar": {
+        "Check Grammar": {
             "Prefix":   r"Can you help me ensure that the grammar and the spelling is correct? " +
                         r"Do not try to polish the text, if no mistake is found, tell me that this paragraph is good." +
                         r"If you find grammar or spelling mistakes, please list mistakes you find in a two-column markdown table, " +
@@ -43,20 +43,28 @@ def get_core_functions():
             "Prefix":   r"Please translate following sentence to English in academic style:" + "\n\n",
             "Suffix":   r"",
         },
-        "学术中英互译": {
-            "Prefix":   r"I want you to act as a scientific English-Chinese translator, " +
-                        r"I will provide you with some paragraphs in one language " +
-                        r"and your task is to accurately and academically translate the paragraphs only into the other language. " +
-                        r"Do not repeat the original provided paragraphs after translation. " +
-                        r"You should use artificial intelligence tools, " +
-                        r"such as natural language processing, and rhetorical knowledge " +
-                        r"and experience about effective writing techniques to reply. " +
-                        r"I'll give you my paragraphs as follows, tell me what language it is written in, and then translate:" + "\n\n",
-            "Suffix": "",
-            "Color": "secondary",
-        },
+        # "学术中英互译": {
+        #     "Prefix":   r"I want you to act as a scientific English-Chinese translator, " +
+        #                 r"I will provide you with some paragraphs in one language " +
+        #                 r"and your task is to accurately and academically translate the paragraphs only into the other language. " +
+        #                 r"Do not repeat the original provided paragraphs after translation. " +
+        #                 r"You should use artificial intelligence tools, " +
+        #                 r"such as natural language processing, and rhetorical knowledge " +
+        #                 r"and experience about effective writing techniques to reply. " +
+        #                 r"I'll give you my paragraphs as follows, tell me what language it is written in, and then translate:" + "\n\n",
+        #     "Suffix": "",
+        #     "Color": "secondary",
+        # },
         "英译中": {
             "Prefix":   r"翻译成地道的中文：" + "\n\n",
+            "Suffix":   r"",
+        },
+        "Rephrase Sentences": {
+            "Prefix":   r"Rephrase the following sentences: " + "\n\n",
+            "Suffix":   r"",
+        }, 
+        "Rephrase Title": {
+            "Prefix":   r"Rephrase the following title: " + "\n\n",
             "Suffix":   r"",
         },
         # "找图片": {
@@ -64,32 +72,40 @@ def get_core_functions():
         #                 r"然后请使用Markdown格式封装，并且不要有反斜线，不要用代码块。现在，请按以下描述给我发送图片：" + "\n\n",
         #     "Suffix":   r"",
         # },
-        "解释代码/Explain Code": {
-            "Prefix":   r"Please explain the following code: " + "\n```\n",
+        "Expand Words to Sentences": {
+            "Prefix":   r"Expand these words to whole sentences: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        "写Python代码/Write Python Code": {
+        "Write Latex Code": {
+            "Prefix":   r"Please write Latex code based on the following description: " + "\n```\n",
+            "Suffix":   "\n```\n",
+        },
+        "Write Python Code": {
             "Prefix":   r"Please write Python code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        "写JavaScript代码/Write JavaScript Code": {
+        "Write JavaScript Code": {
             "Prefix":   r"Please write JavaScript code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        "写HTML代码/Write HTML Code": {
+        "Write HTML Code": {
             "Prefix":   r"Please write HTML code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        "写CSS代码/Write CSS Code": {
+        "Write CSS Code": {
             "Prefix":   r"Please write CSS code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        "写C++代码/Write C++ Code": {
+        "Write C++ Code": {
             "Prefix":   r"Please write C++ code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         }, 
-        "讲个笑话/Tell a joke": {
-            "Prefix":   r"Please tell a joke in both Chinese and English. " + "\n```\n",
+        "Explain Code": {
+            "Prefix":   r"Please explain the following code: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
+        # "讲个笑话/Tell a joke": {
+        #     "Prefix":   r"Please tell a joke in both Chinese and English. " + "\n```\n",
+        #     "Suffix":   "\n```\n",
+        # },
     }

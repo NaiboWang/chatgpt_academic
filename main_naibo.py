@@ -74,8 +74,8 @@ from theme_naibo import adjust_theme, advanced_css
 set_theme = adjust_theme()
 
 # 代理与自动更新
-from check_proxy import check_proxy, auto_update
-proxy_info = check_proxy(proxies)
+# from check_proxy import check_proxy, auto_update
+# proxy_info = check_proxy(proxies)
 
 gr_L1 = lambda: gr.Row(visible=False).style()
 gr_L2 = lambda scale: gr.Column(scale=scale)
@@ -113,7 +113,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
         # print(password, passwords)
         try:
             username = passwords[password]
-            return {identity: username, hint: gr.update(visible=False), login_section: gr.update(visible=False), function_section: gr.update(visible=True), chatbot: [(f"Hello **{username}**, welcome to the demo of the **GPT-4** API. Please type your question in the input sections.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")]}
+            return {identity: username, hint: gr.update(visible=False), login_section: gr.update(visible=False), function_section: gr.update(visible=True), chatbot: [(f"Hello **{username}**, welcome to the demo of the **GPT-4** API. Please type your question in the input section.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")]}
         except:
             return {hint: gr.update(visible=True), identity: "anonymous", login_section: gr.update(visible=True), function_section: gr.update(visible=False)}
             
@@ -122,7 +122,7 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     demo.load(__js = js)
     with gr_L1() as function_section:
         with gr_L2(scale=2):
-            chatbot = gr.Chatbot([("Welcome to the demo of the **GPT-4** API. Please type your question in the input sections.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")])
+            chatbot = gr.Chatbot([("Welcome to the demo of the **GPT-4** API. Please type your question in the input section.", "Hello, I am a GPT-4 model. I can answer your questions about programming, math, or can help you to do English academic writing improvement, translation between different languages, etc.")])
             chatbot.style(height=CHATBOT_HEIGHT)
             history = gr.State([])
         with gr_L2(scale=1):
@@ -130,12 +130,12 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                 with gr.Row():
                     txt = gr.Textbox(show_label=False, placeholder="Input question here.").style(container=False)
                 with gr.Row():
-                    submitBtn = gr.Button("提交/Submit", variant="primary")
+                    submitBtn = gr.Button("Submit", variant="primary")
                 with gr.Row():
-                    resetBtn = gr.Button("重置/Reset", variant="secondary");
+                    resetBtn = gr.Button("Reset", variant="secondary");
                     # stopBtn = gr.Button("停止/Stop", variant="secondary"); stopBtn.style(size="sm")
                 with gr.Row():
-                    status = gr.Markdown(f"Tip: Press Enter to submit, press Shift+Enter to start a new line. Current model: {LLM_MODEL} \n {proxy_info}")
+                    status = gr.Markdown(f"Tip: Press Enter to submit, press Shift+Enter to start a new line. Current model: {LLM_MODEL} \n")
             with gr.Accordion("Quick Actions (Will automatically reset the conversation when you click the buttons)", open=True) as area_basic_fn:
                 with gr.Row():
                     for k in functional:
@@ -170,9 +170,9 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                 with gr.Row():
                     txt2 = gr.Textbox(show_label=False, placeholder="Input question here.", label="输入区2").style(container=False)
                 with gr.Row():
-                    submitBtn2 = gr.Button("提交/Submit", variant="primary")
+                    submitBtn2 = gr.Button("Submit", variant="primary")
                 with gr.Row():
-                    resetBtn2 = gr.Button("重置/Reset", variant="secondary"); resetBtn.style(size="sm")
+                    resetBtn2 = gr.Button("Reset", variant="secondary"); resetBtn.style(size="sm")
                     stopBtn2 = gr.Button("停止/Stop", variant="secondary");
     
     with gr.Row() as login_section:

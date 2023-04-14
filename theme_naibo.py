@@ -236,25 +236,22 @@ if CODE_HIGHLIGHT:
 .btn-primary {
     background-color: #007bff !important;
 }
-#component-70{
+#component-72{
     margin: 0 auto;
 }
 
-#component-71 .no-confidence{
-font-size: 20px;
-color: red;
+.no-confidence{
+font-size: 20px!important;
+color: red!important;
 }
 
-#component-71 span{
+#component-72 span{
     display: none;
 }
-#component-71 .float{
-    display: none;
+.float{
+    display: none!important;
 }
-#component-81 .float{
-    display: none;
-}
-#component-81 button{
-    display: none;
+.download{
+    display: none!important;
 }
 """
