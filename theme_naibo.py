@@ -236,7 +236,7 @@ if CODE_HIGHLIGHT:
 .btn-primary {
     background-color: #007bff !important;
 }
-#component-72{
+#component-74{
     margin: 0 auto;
 }
 

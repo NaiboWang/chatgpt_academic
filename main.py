@@ -111,39 +111,39 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
                     for k in functional:
                         variant = functional[k]["Color"] if "Color" in functional[k] else "secondary"
                         functional[k]["Button"] = gr.Button(k, variant=variant)
-            with gr.Accordion("函数插件区", open=True) as area_crazy_fn:
-                with gr.Row():
-                    gr.Markdown("注意：以下“红颜色”标识的函数插件需从输入区读取路径作为参数.")
-                with gr.Row():
-                    for k in crazy_fns:
-                        if not crazy_fns[k].get("AsButton", True): continue
-                        variant = crazy_fns[k]["Color"] if "Color" in crazy_fns[k] else "secondary"
-                        crazy_fns[k]["Button"] = gr.Button(k, variant=variant)
-                        crazy_fns[k]["Button"].style(size="sm")
-                with gr.Row():
-                    with gr.Accordion("更多函数插件", open=True):
-                        dropdown_fn_list = [k for k in crazy_fns.keys() if not crazy_fns[k].get("AsButton", True)]
-                        with gr.Column(scale=1):
-                            dropdown = gr.Dropdown(dropdown_fn_list, value=r"打开插件列表", label="").style(container=False)
-                        with gr.Column(scale=1):
-                            switchy_bt = gr.Button(r"请先从插件列表中选择", variant="secondary")
-                with gr.Row():
-                    with gr.Accordion("点击展开“文件上传区”。上传本地文件可供红色函数插件调用。", open=False) as area_file_up:
-                        file_upload = gr.Files(label="任何文件, 但推荐上传压缩文件(zip, tar)", file_count="multiple")
-            with gr.Accordion("展开SysPrompt & 交互界面布局 & Github地址", open=(LAYOUT == "TOP-DOWN")):
+            # with gr.Accordion("函数插件区", open=True) as area_crazy_fn:
+            #     with gr.Row():
+            #         gr.Markdown("注意：以下“红颜色”标识的函数插件需从输入区读取路径作为参数.")
+            #     with gr.Row():
+            #         for k in crazy_fns:
+            #             if not crazy_fns[k].get("AsButton", True): continue
+            #             variant = crazy_fns[k]["Color"] if "Color" in crazy_fns[k] else "secondary"
+            #             crazy_fns[k]["Button"] = gr.Button(k, variant=variant)
+            #             crazy_fns[k]["Button"].style(size="sm")
+            #     with gr.Row():
+            #         with gr.Accordion("更多函数插件", open=True):
+            #             dropdown_fn_list = [k for k in crazy_fns.keys() if not crazy_fns[k].get("AsButton", True)]
+            #             with gr.Column(scale=1):
+            #                 dropdown = gr.Dropdown(dropdown_fn_list, value=r"打开插件列表", label="").style(container=False)
+            #             with gr.Column(scale=1):
+            #                 switchy_bt = gr.Button(r"请先从插件列表中选择", variant="secondary")
+            #     with gr.Row():
+            #         with gr.Accordion("点击展开“文件上传区”。上传本地文件可供红色函数插件调用。", open=False) as area_file_up:
+            #             file_upload = gr.Files(label="任何文件, 但推荐上传压缩文件(zip, tar)", file_count="multiple")
+            with gr.Accordion("Expand SysPrompt", open=(LAYOUT == "TOP-DOWN")):
                 system_prompt = gr.Textbox(show_label=True, placeholder=f"System Prompt", label="System prompt", value=initial_prompt)
                 top_p = gr.Slider(minimum=-0, maximum=1.0, value=1.0, step=0.01,interactive=True, label="Top-p (nucleus sampling)",)
                 temperature = gr.Slider(minimum=-0, maximum=2.0, value=1.0, step=0.01, interactive=True, label="Temperature",)
-                checkboxes = gr.CheckboxGroup(["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区", "底部输入区"], value=["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区"], label="显示/隐藏功能区")
-                gr.Markdown(description)
-            with gr.Accordion("备选输入区", open=True, visible=False) as area_input_secondary:
+                # checkboxes = gr.CheckboxGroup(["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区", "底部输入区"], value=["Quick Actions (Will automatically reset the conversation when you click the buttons)", "函数插件区"], label="显示/隐藏功能区")
+                # gr.Markdown(description)
+            with gr.Accordion("Backup Input Section", open=True, visible=False) as area_input_secondary:
                 with gr.Row():
                     txt2 = gr.Textbox(show_label=False, placeholder="Input question here.", label="输入区2").style(container=False)
                 with gr.Row():
                     submitBtn2 = gr.Button("Submit", variant="primary")
                 with gr.Row():
                     resetBtn2 = gr.Button("Reset", variant="secondary"); resetBtn.style(size="sm")
-                    stopBtn2 = gr.Button("停止/Stop", variant="secondary");
+                    # stopBtn2 = gr.Button("停止/Stop", variant="secondary");
     
     with gr.Row() as login_section:
         with gr.Column(scale=0.3, min_width=500):
@@ -164,12 +164,12 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     def fn_area_visibility(a):
         ret = {}
         ret.update({area_basic_fn: gr.update(visible=("Quick Actions (Will automatically reset the conversation when you click the buttons)" in a))})
-        ret.update({area_crazy_fn: gr.update(visible=("函数插件区" in a))})
+        # ret.update({area_crazy_fn: gr.update(visible=("函数插件区" in a))})
         ret.update({area_input_primary: gr.update(visible=("底部输入区" not in a))})
-        ret.update({area_input_secondary: gr.update(visible=("底部输入区" in a))})
+        # ret.update({area_input_secondary: gr.update(visible=("底部输入区" in a))})
         if "底部输入区" in a: ret.update({txt: gr.update(value="")})
         return ret
-    checkboxes.select(fn_area_visibility, [checkboxes], [area_basic_fn, area_crazy_fn, area_input_primary, area_input_secondary, txt, txt2] )
+    # checkboxes.select(fn_area_visibility, [checkboxes], [area_basic_fn, area_crazy_fn, area_input_primary, area_input_secondary, txt, txt2] )
     # 整理反复出现的控件句柄组合
     input_combo = [txt, txt2, top_p, temperature, chatbot, history, system_prompt]
     # 身份确认
@@ -187,32 +187,32 @@ with gr.Blocks(title="ChatGPT Academic", theme=set_theme, analytics_enabled=Fals
     for k in functional:
         click_handle = functional[k]["Button"].click(fn=ArgsGeneralWrapper(predict), inputs=[*input_combo, gr.State(True), gr.State(k), identity], outputs=output_combo)
         cancel_handles.append(click_handle)
-    # 文件上传区，接收文件后与chatbot的互动
-    file_upload.upload(on_file_uploaded, [file_upload, chatbot, txt], [chatbot, txt])
-    # 函数插件-固定按钮区
-    for k in crazy_fns:
-        if not crazy_fns[k].get("AsButton", True): continue
-        click_handle = crazy_fns[k]["Button"].click(ArgsGeneralWrapper(crazy_fns[k]["Function"]), [*input_combo, gr.State(PORT)], output_combo)
-        click_handle.then(on_report_generated, [file_upload, chatbot], [file_upload, chatbot])
-        cancel_handles.append(click_handle)
-    # 函数插件-下拉菜单与随变按钮的互动
-    def on_dropdown_changed(k):
-        variant = crazy_fns[k]["Color"] if "Color" in crazy_fns[k] else "secondary"
-        return {switchy_bt: gr.update(value=k, variant=variant)}
-    dropdown.select(on_dropdown_changed, [dropdown], [switchy_bt] )
-    # 随变按钮的回调函数注册
-    def route(k, *args, **kwargs):
-        if k in [r"打开插件列表", r"请先从插件列表中选择"]: return 
-        yield from ArgsGeneralWrapper(crazy_fns[k]["Function"])(*args, **kwargs)
-    click_handle = switchy_bt.click(route,[switchy_bt, *input_combo, gr.State(PORT)], output_combo)
-    click_handle.then(on_report_generated, [file_upload, chatbot], [file_upload, chatbot])
+    # # 文件上传区，接收文件后与chatbot的互动
+    # file_upload.upload(on_file_uploaded, [file_upload, chatbot, txt], [chatbot, txt])
+    # # 函数插件-固定按钮区
+    # for k in crazy_fns:
+    #     if not crazy_fns[k].get("AsButton", True): continue
+    #     click_handle = crazy_fns[k]["Button"].click(ArgsGeneralWrapper(crazy_fns[k]["Function"]), [*input_combo, gr.State(PORT)], output_combo)
+    #     click_handle.then(on_report_generated, [file_upload, chatbot], [file_upload, chatbot])
+    #     cancel_handles.append(click_handle)
+    # # 函数插件-下拉菜单与随变按钮的互动
+    # def on_dropdown_changed(k):
+    #     variant = crazy_fns[k]["Color"] if "Color" in crazy_fns[k] else "secondary"
+    #     return {switchy_bt: gr.update(value=k, variant=variant)}
+    # dropdown.select(on_dropdown_changed, [dropdown], [switchy_bt] )
+    # # 随变按钮的回调函数注册
+    # def route(k, *args, **kwargs):
+    #     if k in [r"打开插件列表", r"请先从插件列表中选择"]: return 
+    #     yield from ArgsGeneralWrapper(crazy_fns[k]["Function"])(*args, **kwargs)
+    # click_handle = switchy_bt.click(route,[switchy_bt, *input_combo, gr.State(PORT)], output_combo)
+    # click_handle.then(on_report_generated, [file_upload, chatbot], [file_upload, chatbot])
     # def expand_file_area(file_upload, area_file_up):
     #     if len(file_upload)>0: return {area_file_up: gr.update(open=True)}
     # click_handle.then(expand_file_area, [file_upload, area_file_up], [area_file_up])
     cancel_handles.append(click_handle)
     # 终止按钮的回调函数注册
     # stopBtn.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
-    stopBtn2.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
+    # stopBtn2.click(fn=None, inputs=None, outputs=None, cancels=cancel_handles)
     
 # gradio的inbrowser触发不太稳定，回滚代码到原始的浏览器打开函数
 def auto_opentab_delay():

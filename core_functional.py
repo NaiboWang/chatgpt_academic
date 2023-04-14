@@ -88,6 +88,10 @@ def get_core_functions():
             "Prefix":   r"Please write JavaScript code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
+        "Write Linux Shell Code": {
+            "Prefix":   r"Please write Linux Shell code based on the following description: " + "\n```\n",
+            "Suffix":   "\n```\n",
+        },
         "Write HTML Code": {
             "Prefix":   r"Please write HTML code based on the following description: " + "\n```\n",
             "Suffix":   "\n```\n",
@@ -104,8 +108,8 @@ def get_core_functions():
             "Prefix":   r"Please explain the following code: " + "\n```\n",
             "Suffix":   "\n```\n",
         },
-        # "讲个笑话/Tell a joke": {
-        #     "Prefix":   r"Please tell a joke in both Chinese and English. " + "\n```\n",
-        #     "Suffix":   "\n```\n",
-        # },
+        "讲个笑话/Tell a joke": {
+            "Prefix":   r"Please tell a joke in both Chinese and English. " + "\n```\n",
+            "Suffix":   "\n```\n",
+        },
     }

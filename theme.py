@@ -239,15 +239,9 @@ if CODE_HIGHLIGHT:
 .markdown-body pre code {
     background-color: darkgrey !important;
 }
-#component-34, #component-55{
-    display: none !important;
-}
-#component-72{
-    margin: 0 auto;
-}
 
-#component-72 span{
-    display: none;
+#component-50{
+    margin: 0 auto;
 }
 
 .no-confidence{
