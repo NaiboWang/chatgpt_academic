@@ -132,15 +132,25 @@ dmypy.json
 .pyre/
 
 .vscode
+.idea
 
 history
 ssr_conf
 config_private.py
+config.py
 config_private_naibo.py
+config_naibo.py
+main_naibo.py
 gpt_log
 private.md
 private_upload
 other_llms
 cradle*
 debug*
-logs/
+private*
+crazy_functions/test_project/pdf_and_word
+crazy_functions/test_samples
+request_llm/jittorllms
+multi-language
+request_llm/moss
+media

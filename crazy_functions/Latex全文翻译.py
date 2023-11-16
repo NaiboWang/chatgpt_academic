@@ -11,10 +11,9 @@ class PaperFileGroup():
         self.sp_file_tag = []
 
         # count_token
-        import tiktoken
-        from toolbox import get_conf
-        enc = tiktoken.encoding_for_model(*get_conf('LLM_MODEL'))
-        def get_token_num(txt): return len(enc.encode(txt))
+        from request_llm.bridge_all import model_info
+        enc = model_info["gpt-3.5-turbo"]['tokenizer']
+        def get_token_num(txt): return len(enc.encode(txt, disallowed_special=()))
         self.get_token_num = get_token_num
 
     def run_file_split(self, max_token_limit=1900):
@@ -44,10 +43,10 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
     pfg = PaperFileGroup()
 
     for index, fp in enumerate(file_manifest):
-        with open(fp, 'r', encoding='utf-8') as f:
+        with open(fp, 'r', encoding='utf-8', errors='replace') as f:
             file_content = f.read()
             # 定义注释的正则表达式
-            comment_pattern = r'%.*'
+            comment_pattern = r'(?<!\\)%.*'
             # 使用正则表达式查找注释，并替换为空字符串
             clean_tex_content = re.sub(comment_pattern, '', file_content)
             # 记录删除注释后的文本
@@ -80,7 +79,7 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
     elif language == 'zh->en':
         inputs_array = [f"Below is a section from a Chinese academic paper, translate it into English, do not modify any latex command such as \section, \cite and equations:" + 
                         f"\n\n{frag}" for frag in pfg.sp_file_contents]
-        inputs_show_user_array = [f"润色 {f}" for f in pfg.sp_file_tag]
+        inputs_show_user_array = [f"翻译 {f}" for f in pfg.sp_file_tag]
         sys_prompt_array = ["You are a professional academic paper translator." for _ in range(n_split)]
 
     gpt_response_collection = yield from request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
@@ -90,7 +89,7 @@ def 多文件翻译(file_manifest, project_folder, llm_kwargs, plugin_kwargs, ch
         chatbot=chatbot,
         history_array=[[""] for _ in range(n_split)],
         sys_prompt_array=sys_prompt_array,
-        max_workers=10,  # OpenAI所允许的最大并行过载
+        # max_workers=5,  # OpenAI所允许的最大并行过载
         scroller_max_len = 80
     )
 

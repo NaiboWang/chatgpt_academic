@@ -255,4 +255,8 @@ color: red!important;
 .download{
     display: none!important;
 }
+hr{
+margin-top: 10px!important;
+margin-bottom: 10px!important;
+}
 """
